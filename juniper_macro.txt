@@ -1,0 +1,52 @@
+Sub ApplyMacro()
+
+    Dim rng As Range
+    Dim cell As Range
+    Dim editFlag As Boolean
+
+    ' Assuming that the data is in column A
+    Set rng = ThisWorkbook.Sheets("Sheet1").Range("A1:A" & ThisWorkbook.Sheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Row)
+
+    For Each cell In rng
+        
+        If Not IsEmpty(cell) Then
+            
+            ' Check if the value starts with an English letter.
+            If Left(cell.Value, 1) Like "[A-Za-z]" Then
+                
+                ' Add ">," prefix to lines between "edit" and "exit".
+                If editFlag And Not (InStr(1, cell.Value, "exit") > 0) Then
+                    
+                    cell.Value ="#," & Trim(cell.Value)
+                    
+                Else
+                    
+                    cell.Value = ">," & Trim(cell.Value)
+                    
+                End If
+                
+            Else 
+                
+                cell.Value = "//" & Trim(cell.Value)
+                
+            End If
+            
+            
+            ' Check if "edit" or "exit" is present in the value.
+            If InStr(1, cell.Value, ">," & "edit") > 0 Then
+                
+                editFlag = True
+                
+            ElseIf InStr(1, cell.Value, "#," & "exit") > 0 Or _
+                   InStr(1, cell.Value, ">," & "exit") > 0 Then
+                
+                editFlag = False
+                
+            End If   
+            
+            
+        End If
+        
+    Next cell
+
+End Sub
