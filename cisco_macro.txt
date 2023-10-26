@@ -1,28 +1,29 @@
-Sub ApplyMacro()
+Sub AddPrefixToEnglishStart()
 
     Dim rng As Range
     Dim cell As Range
+    Dim ws As Worksheet
 
-    ' Assuming that the data is in column A
-    Set rng = ThisWorkbook.Sheets("Sheet1").Range("A1:A" & ThisWorkbook.Sheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Row)
-
-    For Each cell In rng
+    Set ws = ActiveSheet ' 현재 활성화된 시트를 사용합니다.
+    
+    On Error Resume Next ' 에러 발생시 다음 줄로 넘어가도록 설정합니다.
+    
+    For Each rng In ws.UsedRange ' 사용중인 모든 범위에 대해 실행합니다.
+        If IsError(rng.Value) Then GoTo nextcell ' 값이 비문자열인 경우 다음 셀로 이동합니다.
         
-        If Not IsEmpty(cell) Then
+        If rng.Value <> "" Then ' 값이 비어있지 않은 경우에만 작업을 수행합니다.
+            Dim firstChar As String
+            firstChar = Left(Trim(rng.Value), 1) ' 첫번째 문자를 가져옵니다 (공백 제거 후).
             
-            ' Check if the value starts with an English letter.
-            If Left(cell.Value, 1) Like "[A-Za-z]" Then
-                
-                cell.Value ="#," & Trim(cell.Value)
-                
-            Else 
-                
-                cell.Value = "//" & Trim(cell.Value)
-                
+            If firstChar Like "[A-Za-z]" Then ' 첫번째 문자가 영문자인지 확인합니다.
+                rng.Value = "#," & rng.Value ' 영문자인 경우 "#,"를 추가해줍니다.
+            Else
+                rng.Value = "//" & rng.Value ' 영문자가 아닌 경우 "//" 를 추가해줍니다.
             End If
-            
         End If
         
-    Next cell
+nextcell:
+        
+    Next rng
 
 End Sub
